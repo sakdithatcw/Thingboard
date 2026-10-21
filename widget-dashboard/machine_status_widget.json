@@ -1,0 +1,24 @@
+{
+  "widgetsBundle": {
+    "alias": "manufacturing_ui",
+    "title": "Manufacturing UI Widgets"
+  },
+  "widgetTypes": [
+    {
+      "alias": "machine_status_card",
+      "name": "Machine Status Card",
+      "descriptor": {
+        "type": "latest",
+        "sizeX": 4,
+        "sizeY": 3,
+        "resources": [],
+        "templateHtml": "<div class=\"card-container\" ng-class=\"{'status-run': isRun, 'status-stop': !isRun}\">\n    <div class=\"card-header\">\n        <span class=\"title\">MACHINE STATUS (REAL-TIME)</span>\n        <div class=\"badge\">Active</div>\n    </div>\n    <div class=\"card-body\">\n        <div class=\"status-text\">{{status}}</div>\n    </div>\n    <div class=\"card-footer\">\n        <span class=\"footer-text\">Current CT Signal: <strong class=\"highlight\">{{ctSignal}} A</strong></span>\n        <span class=\"footer-text\">Sampling: Every 1s</span>\n    </div>\n</div>",
+        "templateCss": ".card-container {\n    background-color: #1a222c;\n    border-radius: 12px;\n    padding: 16px;\n    color: #fff;\n    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;\n    height: 100%;\n    display: flex;\n    flex-direction: column;\n    justify-content: space-between;\n    border: 1px solid #2a3545;\n    box-sizing: border-box;\n}\n\n.card-header {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n.title {\n    color: #00d285;\n    font-size: 12px;\n    font-weight: 600;\n    letter-spacing: 0.5px;\n}\n\n.badge {\n    background-color: #00d285;\n    color: #1a222c;\n    padding: 4px 10px;\n    border-radius: 20px;\n    font-size: 11px;\n    font-weight: bold;\n}\n\n.card-body {\n    margin: 15px 0;\n}\n\n.status-text {\n    color: #00d285;\n    font-size: 32px;\n    font-weight: bold;\n    text-transform: uppercase;\n}\n\n.card-footer {\n    display: flex;\n    justify-content: space-between;\n    font-size: 11px;\n    color: #8c97a8;\n}\n\n.highlight {\n    color: #fff;\n}\n\n/* Dynamic Styles: เปลี่ยนสีเมื่อหยุดทำงาน */\n.status-stop .title,\n.status-stop .status-text {\n    color: #ff5b5b;\n}\n.status-stop .badge {\n    background-color: #ff5b5b;\n}",
+        "controllerScript": "self.onInit = function() {\n    self.ctx.$scope.status = 'RUN (ฉีดผลิต)';\n    self.ctx.$scope.ctSignal = '84.2';\n    self.ctx.$scope.isRun = true;\n};\n\nself.onDataUpdated = function() {\n    if (self.ctx.data.length > 0) {\n        for (var i = 0; i < self.ctx.data.length; i++) {\n            var cellData = self.ctx.data[i];\n            if (cellData.data.length > 0) {\n                var val = cellData.data[0][1];\n                var key = cellData.dataKey.name;\n                \n                if (key === 'status') {\n                    self.ctx.$scope.status = val;\n                    self.ctx.$scope.isRun = (String(val).toUpperCase() === 'RUN' || String(val).indexOf('ฉีดผลิต') !== -1 || val === '1' || val === true);\n                }\n                if (key === 'ct_signal') {\n                    self.ctx.$scope.ctSignal = Number(val).toFixed(1);\n                }\n            }\n        }\n        self.ctx.$scope.$digest();\n    }\n};",
+        "settingsSchema": "",
+        "dataKeySettingsSchema": "",
+        "defaultConfig": "{\"datasources\":[{\"type\":\"entity\",\"dataKeys\":[{\"name\":\"status\",\"type\":\"timeseries\",\"label\":\"Status\",\"settings\":{}},{\"name\":\"ct_signal\",\"type\":\"timeseries\",\"label\":\"CT Signal\",\"settings\":{}}]}],\"timewindow\":{\"realtime\":{\"timewindowMs\":60000}}}"
+      }
+    }
+  ]
+}
